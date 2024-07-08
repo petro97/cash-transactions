@@ -1,7 +1,6 @@
 const axios = require('axios');
 const { roundUp, getWeekNumber } = require('./utils');
-const API_HOST = 'https://developers.paysera.com'
-
+const API_HOST = process.env.API_HOST
 /**
  * Get cash in commission.
  * @param {number} amount - amount.
@@ -10,6 +9,10 @@ const API_HOST = 'https://developers.paysera.com'
 const getCashInCommission = async (amount) => {
     const response = await axios.get(`${API_HOST}/tasks/api/cash-in`);
     const config = response.data;
+    return calculateCashInCommission(amount, config)
+};
+
+const calculateCashInCommission = async (amount, config) => {
     const commission = roundUp(amount * (config.percents / 100));
     return commission > config.max.amount ? config.max.amount : commission;
 };
@@ -25,6 +28,10 @@ const getCashInCommission = async (amount) => {
 const getNaturalCashOutCommission = async (userId, amount, date, transactions) => {
     const response = await axios.get(`${API_HOST}/tasks/api/cash-out-natural`)
     const config = response.data
+    return calculateNaturalCashOutCommission(userId, amount, date, transactions, config)
+}
+
+const calculateNaturalCashOutCommission = async (userId, amount, date, transactions, config) => {
     const weekNumber = getWeekNumber(date);
     const transactionDate = new Date(date);
 
@@ -40,7 +47,7 @@ const getNaturalCashOutCommission = async (userId, amount, date, transactions) =
         weeklyTotal += txn.operation.amount;
     }
 
-    // Check if the current transaction pushes the total over the limit
+// Check if the current transaction pushes the total over the limit
     if (weeklyTotal + amount > freeLimit) {
         if (weeklyTotal < freeLimit) {
             chargeableAmount = weeklyTotal + amount - freeLimit;
@@ -59,13 +66,21 @@ const getNaturalCashOutCommission = async (userId, amount, date, transactions) =
 const getLegalCashOutCommission = async (amount) => {
     const response = await axios.get(`${API_HOST}/tasks/api/cash-out-juridical`);
     const config = response.data;
+    return calculateLegalCashOutCommission(amount, config)
+};
+const calculateLegalCashOutCommission = async (amount, config) => {
     const commission = roundUp(amount * 0.003);
     return commission < config.min ? config.min : commission;
-};
+}
+
+
 
 
 module.exports = {
     getCashInCommission,
     getNaturalCashOutCommission,
-    getLegalCashOutCommission
+    getLegalCashOutCommission,
+    calculateCashInCommission,
+    calculateNaturalCashOutCommission,
+    calculateLegalCashOutCommission
 };

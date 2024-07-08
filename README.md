@@ -22,6 +22,15 @@ This project calculates commission fees cash-in and cash-out transactions based 
     npm install
     ```
 
+3. **Set up API keys:**
+
+Create a `.env` file in the root directory of the project and add the following environment variables:
+
+```env
+API_HOST=https://api.example.com
+```
+
+
 ## Usage
 
 To run the application, use the following command:
