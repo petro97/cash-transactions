@@ -12,7 +12,7 @@ This project calculates commission fees cash-in and cash-out transactions based 
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/yourusername/cash-transactions.git
+    git clone https://github.com/petro97/cash-transactions
     cd cash-transactions
     ```
 
